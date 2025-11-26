@@ -1,5 +1,5 @@
 const START_KEY = "sakippo_diagnosis_started_at";
-// 診断結果を保存しておくキー（1人1回きり判定用）
+// 以前は1人1回きり判定に使っていたが、今は履歴保存のみで使用
 const RESULT_KEY = "sakippo_diagnosis_result_v1";
 
 const questions = [
@@ -95,12 +95,6 @@ const resultImage = document.getElementById("resultImage");
 let currentIndex = 0;
 let answered = false;
 let userAnswers = new Array(questions.length).fill(null);
-
-function hasLimit() {
-  // 診断結果が保存されている = すでに1度診断を完了している
-  const stored = localStorage.getItem(RESULT_KEY);
-  return !!stored;
-}
 
 function openConfirmModal() {
   confirmModal.classList.remove("hidden");
@@ -310,10 +304,6 @@ function handleAnswer(answer) {
 }
 
 startBtn.addEventListener("click", () => {
-  if (hasLimit()) {
-    openLimitModal();
-    return;
-  }
   openConfirmModal();
 });
 
@@ -329,10 +319,6 @@ confirmStartBtn.addEventListener("click", () => {
 
 cancelStartBtn.addEventListener("click", () => {
   closeConfirmModal();
-});
-
-limitOkBtn.addEventListener("click", () => {
-  closeLimitModal();
 });
 
 answerABtn.addEventListener("click", () => handleAnswer("A"));
@@ -353,10 +339,4 @@ if (prevQuestionBtn) {
   });
 }
 
-// ページを開いたときに、過去の診断結果があれば最初の結果画面をそのまま表示
-const saved = loadSavedResult();
-if (saved && typeof saved.percent === "number") {
-  renderResult(saved.percent);
-}
-
-
+// ページを開いたときは毎回、最初から診断できる状態にしておく
